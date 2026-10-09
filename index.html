@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer AI Era Roadmap Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --tag-bg: #0f2e46;
+      --tag-color: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .progress-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #334155;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filters {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #fff;
+    }
+
+    /* Modal / Add Section */
+    .add-panel {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .add-panel.show {
+      display: flex;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-field {
+      flex: 1;
+      min-width: 200px;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* List items */
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .video-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .video-item.dragging {
+      opacity: 0.4;
+      border-color: var(--accent);
+    }
+
+    .video-item:hover {
+      border-color: #475569;
+    }
+
+    .video-item.done {
+      background: #151f30;
+      border-color: #1e293b;
+    }
+
+    .video-item.done .video-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .checkbox-wrap input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--success);
+    }
+
+    .order-idx {
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: var(--text-muted);
+      min-width: 24px;
+    }
+
+    .video-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .video-tag {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      background: var(--tag-bg);
+      color: var(--tag-color);
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+      font-weight: 600;
+    }
+
+    .video-title {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .video-title:hover {
+      color: var(--accent);
+    }
+
+    .reorder-controls {
+      display: none;
+      gap: 4px;
+    }
+
+    .reorder-active .reorder-controls {
+      display: flex;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .btn-delete:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Developer Roadmap & Playlist Tracker</h1>
+      <p class="subtitle">Curated in sequential learning order from backend systems to AI engineering.</p>
+      
+      <div class="progress-box">
+        <div class="progress-stats">
+          <span id="progress-count">0 / 0 Completed</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="filters">
+          <button class="btn active" onclick="setFilter('all', this)">All</button>
+          <button class="btn" onclick="setFilter('unwatched', this)">Remaining</button>
+          <button class="btn" onclick="setFilter('completed', this)">Done</button>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="btn" id="reorder-toggle" onclick="toggleReorderMode()">Toggle Reorder</button>
+          <button class="btn btn-primary" onclick="toggleAddPanel()">+ Add Video</button>
+          <button class="btn" onclick="resetToCurated()">Reset Sequence</button>
+        </div>
+      </div>
+
+      <div class="add-panel" id="add-panel">
+        <div class="input-row">
+          <input type="text" id="new-title" class="input-field" placeholder="Video Title" />
+          <input type="text" id="new-url" class="input-field" placeholder="Link / URL (e.g. url?id=...)" />
+          <input type="text" id="new-phase" class="input-field" placeholder="Phase (e.g. Phase 1: Backend)" />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn" onclick="toggleAddPanel()">Cancel</button>
+          <button class="btn btn-primary" onclick="addNewVideo()">Save Video</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="video-list" id="video-list"></div>
+  </div>
+
+  <script>
+    const INITIAL_SEQUENCE = [
+      // Phase 1: Core Backend & Distributed Infrastructure
+      { id: "v1", title: "Complete Backend One Shot | Beginners to Advanced | Learn Node.js, Express, MongoDB from Scratch", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=0IciwnJ6PJI&list=PLLSbwhxvFaao&index=1&pp=iAQBsAgC", completed: false },
+      { id: "v2", title: "Complete Authentication System | JWT, Refresh Token, OTP, Logout All Devices", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=pkKn8q5AvsY&list=PLLSbwhxvFaao&index=3&pp=iAQBsAgC", completed: false },
+      { id: "v3", title: "Advanced Backend Project | Learn Bank Transaction System with Node.js, Express & MongoDB", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=NQOAQP0mow0&list=PLLSbwhxvFaao&index=4&pp=iAQBsAgC", completed: false },
+      { id: "v4", title: "Real-Time WebSockets Course | Build a Live Sports Dashboard with Node.js & PostgreSQL", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=pbOXOY78dNA&list=PLLSbwhxvFaao&index=5&pp=iAQBsAgC", completed: false },
+      { id: "v5", title: "Redis Crash Course", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=Vx2zPMPvmug&list=PLLSbwhxvFaao&index=39&pp=iAQBsAgC", completed: false },
+      { id: "v6", title: "Apache Kafka Crash Course | What is Kafka?", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=ZJJHm_bd9Zo&list=PLLSbwhxvFaao&index=40&t=36s&pp=iAQBsAgC", completed: false },
+      { id: "v7", title: "NestJS Full Course for Beginners in 2026 | Build a Production-Ready API", phase: "Phase 1: Backend & Distributed", url: "https://www.youtube.com/watch?v=Q6NpiIp-6WM&list=PLLSbwhxvFaao&index=2&t=81s&pp=iAQBsAgC", completed: false },
+
+      // Phase 2: Full-Stack SaaS & Next.js Ecosystem
+      { id: "v8", title: "Next.js Series - Learn What Matters 1: Understanding Next.js", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=aEo95gIYYv4&list=PLLSbwhxvFaao&index=6&pp=iAQBsAgC", completed: false },
+      { id: "v9", title: "Build and Deploy a Full Stack React Admin Dashboard with Tables, Charts and Real Data", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=xZ1ba-RLrjo&list=PLLSbwhxvFaao&index=7&pp=iAQBsAgC", completed: false },
+      { id: "v10", title: "Build and Deploy a Full Stack Google Drive Clone with Next.js 15", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=lie0cr3wESQ&list=PLLSbwhxvFaao&index=8&pp=iAQBsAgC", completed: false },
+      { id: "v11", title: "Full Stack Engineering Course | Build and Deploy a Full Stack PERN Admin Dashboard in 2026", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=ek7hmv5PVV8&list=PLLSbwhxvFaao&index=9&pp=iAQBsAgC", completed: false },
+      { id: "v12", title: "SaaS App Full Course 2026 | Launch Your SaaS in Under 7 Days with Next JS, Supabase & Payments", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=XUkNR-JfHwo&list=PLLSbwhxvFaao&index=10&pp=iAQBsAgC", completed: false },
+      { id: "v13", title: "Build and Deploy a Full Stack Screen Recording & Video Sharing Platform | Next.js, Better Auth", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=honnJp7-cCU&list=PLLSbwhxvFaao&index=11&pp=iAQBsAgC", completed: false },
+      { id: "v14", title: "Build and Deploy a Full Stack Learning Platform | Search Any Video, Jump to the Exact Second", phase: "Phase 2: Full-Stack & Next.js", url: "https://www.youtube.com/watch?v=8DfvwZ812dM&list=PLLSbwhxvFaao&index=32&pp=iAQBsAgC", completed: false },
+
+      // Phase 3: System Design & DevOps Infrastructure
+      { id: "v15", title: "System Design for Beginners", phase: "Phase 3: System Design & DevOps", url: "https://www.youtube.com/watch?v=lFeYU31TnQ8&list=PLLSbwhxvFaao&index=41&t=155s&pp=iAQBsAgC", completed: false },
+      { id: "v16", title: "What is Horizontal Scaling ? | 3rd year Students watch this", phase: "Phase 3: System Design & DevOps", url: "https://www.youtube.com/watch?v=MlIBQxE3dwU&list=PLLSbwhxvFaao&index=12&pp=iAQBsAgC", completed: false },
+      { id: "v17", title: "Docker Vs Kubernetes | What is Docker ? | What is Kubernetes ?", phase: "Phase 3: System Design & DevOps", url: "https://www.youtube.com/watch?v=oyjGMFzKgVQ&list=PLLSbwhxvFaao&index=13&pp=iAQBsAgC", completed: false },
+      { id: "v18", title: "Complete Docker + AWS | Deploy Your First Project in One Shot (Beginners)", phase: "Phase 3: System Design & DevOps", url: "https://www.youtube.com/watch?v=Uf6PXnagtsg&list=PLLSbwhxvFaao&index=14&pp=iAQBsAgC", completed: false },
+      { id: "v19", title: "DevOps from Zero to Hero: Build and Deploy a Production API", phase: "Phase 3: System Design & DevOps", url: "https://www.youtube.com/watch?v=H5FAxTBuNM8&list=PLLSbwhxvFaao&index=15&pp=iAQBsAgC", completed: false },
+      { id: "v20", title: "How Senior Engineers Actually Think About System Design & Architecture | Full Course", phase: "Phase 3: System Design & DevOps", url: "url?id=23", completed: false },
+
+      // Phase 4: Applied AI Fundamentals, RAG & Agents
+      { id: "v21", title: "Why 90% of Coders Never Become Developers | They’re Not Job Ready", phase: "Phase 4: Applied AI & Agents", url: "url?id=49", completed: false },
+      { id: "v22", title: "Develop with AI | Not Vibe Coding | AI Assisted Development", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=hUb0yBr11So&list=PLLSbwhxvFaao&index=20&pp=iAQBsAgC", completed: false },
+      { id: "v23", title: "Claude Code Full Course 2026 | How Senior Engineers Actually Build with AI", phase: "Phase 4: Applied AI & Agents", url: "url?id=29", completed: false },
+      { id: "v24", title: "Building AI Agent from Scratch", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=vUYnRGotTbo&list=PLLSbwhxvFaao&index=42&t=430s&pp=iAQB0gcJCTcMAYcqIYzvsAgC", completed: false },
+      { id: "v25", title: "Complete Agentic AI | Generative AI | Langchain | Streaming", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=ltXrphVNj_w&list=PLLSbwhxvFaao&index=22&pp=iAQBsAgC", completed: false },
+      { id: "v26", title: "Production RAG with LangChain & Vector Databases – Full Course", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=mHxLXzYjQRE&list=PLLSbwhxvFaao&index=25&t=26846s&pp=iAQBsAgC", completed: false },
+      { id: "v27", title: "How to Build a Scalable RAG System for AI Apps (Full Architecture)", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=4KiiKQ9RVvA&list=PLLSbwhxvFaao&index=31&t=13s&pp=iAQBsAgC", completed: false },
+      { id: "v28", title: "Building AI Agents that actually work (Full Course)", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=eA9Zf2-qYYM&list=PLLSbwhxvFaao&index=35&pp=iAQBsAgC", completed: false },
+      { id: "v29", title: "The Engineering System for AI Agents.", phase: "Phase 4: Applied AI & Agents", url: "https://www.youtube.com/watch?v=Vok_nReMFaU&list=PLLSbwhxvFaao&index=37&pp=iAQBsAgC", completed: false },
+
+      // Phase 5: Production Full-Stack AI Capstones
+      { id: "v30", title: "Learn AI Engineering in 2026 | Build a Full Stack AI Websites with Agents", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=tz-CPq3WgeA&list=PLLSbwhxvFaao&index=23&pp=iAQBsAgC", completed: false },
+      { id: "v31", title: "The Right Way to Build AI Apps in 2026 | Next.js 16 Course", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=NiwawEe92Co&list=PLLSbwhxvFaao&index=24&t=124s&pp=iAQBsAgC", completed: false },
+      { id: "v32", title: "Gen AI + Full Stack Web Development Project | React, Node, JWT, Gemini", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=zG3hNL08Dro&list=PLLSbwhxvFaao&index=26&pp=iAQBsAgC", completed: false },
+      { id: "v33", title: "Race 60+ Free Open Source LLMs | Build and Deploy the App Yourself", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=xEBSV-M-qFk&list=PLLSbwhxvFaao&index=27&pp=iAQBsAgC", completed: false },
+      { id: "v34", title: "Build and Deploy a Full-Stack AI App (Completely Free)", phase: "Phase 5: Full-Stack AI Capstones", url: "url?id=37", completed: false },
+      { id: "v35", title: "Build and Deploy a Full AI-Powered Applicant Tracking System", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=iYOz165wGkQ&list=PLLSbwhxvFaao&index=29&t=85s&pp=iAQBsAgC", completed: false },
+      { id: "v36", title: "How Senior Engineers Actually Build with AI in 2026 | Build a Full Stack Job Applications Platform", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=9dKA2hq4vf0&list=PLLSbwhxvFaao&index=30&t=4165s&pp=iAQBsAgC", completed: false },
+      { id: "v37", title: "Full Stack AI App: Build a Real-Time Voice Agent Interview Platform", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=8GK8R77Bd7g&list=PLLSbwhxvFaao&index=33&pp=iAQB0gcJCTcMAYcqIYzvsAgC", completed: false },
+      { id: "v38", title: "How Senior Engineers Actually Build With AI in 2026 | Build a Full Stack Systems Architecture App", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=14RP8liACqo&list=PLLSbwhxvFaao&index=34&t=13895s&pp=iAQBsAgC", completed: false },
+      { id: "v39", title: "Nobody Can Read AI Code Anymore | Build a Full Stack Codebase Intelligence App (with AI Agents)", phase: "Phase 5: Full-Stack AI Capstones", url: "https://www.youtube.com/watch?v=-AkIj8TG3Uc&list=PLLSbwhxvFaao&index=36&t=3094s&pp=iAQBsAgC", completed: false },
+
+      // Phase 6: Deep Tech & Mobile Electives
+      { id: "v40", title: "Let's build GPT: from scratch, in code, spelled out.", phase: "Phase 6: Electives & Deep Dive", url: "https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLLSbwhxvFaao&index=19&t=4012s&pp=iAQBsAgC", completed: false },
+      { id: "v41", title: "React Native Full Course 2026 | Build, Publish and Monetize a Full Stack Mobile App to App Store", phase: "Phase 6: Electives & Deep Dive", url: "https://www.youtube.com/watch?v=4nVoLX2taFg&list=PLLSbwhxvFaao&index=17&pp=iAQBsAgC", completed: false },
+      { id: "v42", title: "How to Actually Build Mobile Apps with AI in 2026 | A Complete Beginner's Tutorial", phase: "Phase 6: Electives & Deep Dive", url: "https://www.youtube.com/feed/subscriptions5", completed: false }
+    ];
+
+    let videos = JSON.parse(localStorage.getItem("dev_roadmap_videos")) || INITIAL_SEQUENCE;
+    let currentFilter = "all";
+    let isReorderMode = false;
+    let draggedIndex = null;
+
+    function saveState() {
+      localStorage.setItem("dev_roadmap_videos", JSON.stringify(videos));
+      render();
+    }
+
+    function toggleCheck(index) {
+      videos[index].completed = !videos[index].completed;
+      saveState();
+    }
+
+    function toggleReorderMode() {
+      isReorderMode = !isReorderMode;
+      document.body.classList.toggle("reorder-active", isReorderMode);
+      const btn = document.getElementById("reorder-toggle");
+      btn.classList.toggle("active", isReorderMode);
+      render();
+    }
+
+    function moveItem(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= videos.length) return;
+      const temp = videos[index];
+      videos[index] = videos[targetIndex];
+      videos[targetIndex] = temp;
+      saveState();
+    }
+
+    function deleteItem(index) {
+      if (confirm("Remove this video from your list?")) {
+        videos.splice(index, 1);
+        saveState();
+      }
+    }
+
+    function toggleAddPanel() {
+      const panel = document.getElementById("add-panel");
+      panel.classList.toggle("show");
+    }
+
+    function addNewVideo() {
+      const title = document.getElementById("new-title").value.trim();
+      const url = document.getElementById("new-url").value.trim();
+      const phase = document.getElementById("new-phase").value.trim() || "Custom Additions";
+
+      if (!title) {
+        alert("Please enter a title");
+        return;
+      }
+
+      videos.push({
+        id: "custom_" + Date.now(),
+        title: title,
+        phase: phase,
+        url: url || "#",
+        completed: false
+      });
+
+      document.getElementById("new-title").value = "";
+      document.getElementById("new-url").value = "";
+      document.getElementById("new-phase").value = "";
+      toggleAddPanel();
+      saveState();
+    }
+
+    function resetToCurated() {
+      if (confirm("Reset to default curated order? Custom entries will be replaced.")) {
+        videos = JSON.parse(JSON.stringify(INITIAL_SEQUENCE));
+        saveState();
+      }
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll(".filters .btn").forEach(btn => btn.classList.remove("active"));
+      el.classList.add("active");
+      render();
+    }
+
+    function updateProgress() {
+      const total = videos.length;
+      const completed = videos.filter(v => v.completed).length;
+      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+      document.getElementById("progress-count").innerText = `${completed} / ${total} Completed`;
+      document.getElementById("progress-percent").innerText = `${pct}%`;
+      document.getElementById("progress-fill").style.width = `${pct}%`;
+    }
+
+    function render() {
+      updateProgress();
+      const listEl = document.getElementById("video-list");
+      listEl.innerHTML = "";
+
+      videos.forEach((video, index) => {
+        if (currentFilter === "completed" && !video.completed) return;
+        if (currentFilter === "unwatched" && video.completed) return;
+
+        const item = document.createElement("div");
+        item.className = `video-item ${video.completed ? "done" : ""}`;
+        if (isReorderMode) {
+          item.draggable = true;
+          item.addEventListener("dragstart", () => {
+            draggedIndex = index;
+            item.classList.add("dragging");
+          });
+          item.addEventListener("dragend", () => {
+            item.classList.remove("dragging");
+          });
+          item.addEventListener("dragover", (e) => e.preventDefault());
+          item.addEventListener("drop", (e) => {
+            e.preventDefault();
+            if (draggedIndex === null || draggedIndex === index) return;
+            const moved = videos.splice(draggedIndex, 1)[0];
+            videos.splice(index, 0, moved);
+            saveState();
+          });
+        }
+
+        item.innerHTML = `
+          <label class="checkbox-wrap">
+            <input type="checkbox" ${video.completed ? "checked" : ""} onchange="toggleCheck(${index})" />
+          </label>
+          <span class="order-idx">#${String(index + 1).padStart(2, "0")}</span>
+          <div class="video-content">
+            <span class="video-tag">${video.phase}</span>
+            <a href="${video.url}" target="_blank" class="video-title" title="${video.title}">${video.title}</a>
+          </div>
+          <div class="reorder-controls">
+            <button class="icon-btn" onclick="moveItem(${index}, -1)" title="Move Up">↑</button>
+            <button class="icon-btn" onclick="moveItem(${index}, 1)" title="Move Down">↓</button>
+            <button class="icon-btn btn-delete" onclick="deleteItem(${index})" title="Delete">✕</button>
+          </div>
+        `;
+
+        listEl.appendChild(item);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
